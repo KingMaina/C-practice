@@ -1,23 +1,12 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "environment.h"
 
-extern char **environ;
-#define BUFF_SIZE 1024
-#define MAX_TOKENS 1024
-#define DELIM ":"
-
-typedef struct directory_list
-{
-	char *dir_name;
-	struct directory_list *next;
-} dir_l;
-
-char *_getenv(const char *name);
-void print_env_dir(const char *name);
-dir_l *add_node_begin(dir_l **head, char *str);
-dir_l *build_env_dirs(dir_l **head, char *str);
-
+/**
+* _getenv - Searches the environment variable specified
+* @name: The environment variable
+*
+* Return: Pointer to the start of the env variable's value,
+* NULL otherwise
+*/
 char *_getenv(const char *name)
 {
 	int i = 0;
@@ -37,6 +26,13 @@ char *_getenv(const char *name)
 	return (NULL);
 }
 
+/**
+* print_env_dir - Prints a list of directories from
+* the PATH env variable
+* @name: The PATH env value
+*
+* Return: void
+*/
 void print_env_dir(const char *name)
 {
 	while (*name != '\0')
@@ -52,10 +48,18 @@ void print_env_dir(const char *name)
 	printf("\n");
 }
 
+/**
+* add_node_begin - Adds a new node to the start of a
+* dir_l linked list
+* @head: Pointer to the head node's address
+* @str: String to add to the node
+*
+* Return: Pointer to the created node
+*/
 dir_l *add_node_begin(dir_l **head, char *str)
 {
 	dir_l *node = NULL;
-	
+
 	if (str == NULL)
 	{
 		fprintf(stderr, "Cannot create an empty node\n");
@@ -81,6 +85,13 @@ dir_l *add_node_begin(dir_l **head, char *str)
 	return (node);
 }
 
+/**
+* build_env_dirs - Creates a linked list from a delimetered string
+* @head: Pointer to the head node of a dir_l linked list
+* @str: Delimetered string
+*
+* Return: Pointer to the start of the linked list, NULL otherwise on error
+*/
 dir_l *build_env_dirs(dir_l **head, char *str)
 {
 	char *token = NULL;
@@ -93,43 +104,42 @@ dir_l *build_env_dirs(dir_l **head, char *str)
 	token = strtok(str, DELIM);
 	while (token != NULL)
 	{
-		add_node_begin(head ,token);
+		add_node_begin(head, token);
 		token = strtok(NULL, DELIM);
 	}
 	return (*head);
 }
 
-int main(void)
+/**
+* free_dirl - De-allocates memory from a dir_l linked list
+* @head: Pointer to the head node address of the linked list
+*
+* Return: void
+*/
+void free_dirl(dir_l **head)
 {
-	char *var = "PATH";
-	char *_env = _getenv(var);
-	dir_l *dirs = NULL;
-	dir_l *dir_ptr = NULL;
-	if (_env == NULL)
-	{
-		printf("Did not find the path specified");
-		return (1);
-	}
-	print_env_dir((const char *) _env);
-	dirs = build_env_dirs(&dirs, _env);
-	if (dirs == NULL)
-	{
-		perror("Error building dir list\n");
-		free(_env);
-		return (1);
-	}
+	dir_l *curr_ptr = NULL;
+	dir_l *next_ptr = NULL;
 
-	dir_ptr = dirs;
-	while (dir_ptr->next != NULL)
+	if (!head || !(*head))
 	{
-		printf("Directory: %s\n", dir_ptr->dir_name);
-		dir_ptr = dir_ptr->next;
+		fprintf(stderr, "List not found");
 	}
-/*	dir_ptr = dirs;
-	while (dir_ptr->next != NULL)
+	else
 	{
-		free();
-*/	free(_env);
+		curr_ptr = *head;
+		next_ptr = (*head)->next;
 
-	return (0);
+		while (next_ptr != NULL)
+		{
+			free(curr_ptr->dir_name);
+			free(curr_ptr);
+			curr_ptr = next_ptr;
+			next_ptr = next_ptr->next;
+		}
+		free(curr_ptr->dir_name);
+		free(curr_ptr);
+		*head = NULL;
+	}
 }
+
