@@ -6,6 +6,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <sys/wait.h>
+#include <sys/types.h>
 
 void prompt(void);
 
