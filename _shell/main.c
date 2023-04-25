@@ -1,17 +1,18 @@
 #include "main.h"
 
+#define BUFF_SIZE 1024
+#define DELIM " \t\n"
+
 /**
 * main - Entry of app
-* @argc: Number of arguments to the program
-* @argv: NULL terminated list of the program arguments
 *
-* Return: Always 0, error otherwise
+* Return: Always 0, error otherwise if non-zero
 */
 int main(void)
 {
 	char **tokens = NULL;
 	char *buffer = NULL;
-	size_t buff_len = 0, i;
+	size_t buff_len = 0;
 	ssize_t bytesRead = -1;
 
 	while (1)
@@ -21,23 +22,24 @@ int main(void)
 		if (bytesRead == -1)
 		{
 			printf("Error\n");
-			return (EXIT_FAILURE);
+			free(buffer);
+			return (EXIT_SUCCESS);
 		}
 		if (buffer[0] == '\n')
+		{
+			free(buffer);
+			buff_len = 0;
 			continue;
+		}
 		if (strstr(buffer, "exit\n"))
 			break;
-		printf("%s", buffer);
-		buff_len = strlen(buffer);
-		tokens = tokenize(buffer, buff_len);
+		tokens = tokenize(buffer, DELIM);
 		if (tokens == NULL)
 			break;
-		for (i = 0; tokens[i] != NULL; i++)
-			printf("%s\n", tokens[i]);
+		free_buffer(buffer);
+		free_tokens(&tokens);
+		buff_len = 0;
 	}
-	if (tokens != NULL)
-		free_tokens(tokens);
-	free(buffer);
 
 	return (EXIT_SUCCESS);
 }

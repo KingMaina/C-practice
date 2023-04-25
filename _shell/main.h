@@ -7,7 +7,8 @@
 #include <stdlib.h>
 
 void print_prompt(void);
-char **tokenize(char *str, size_t str_len);
-void free_tokens(char **tokens);
+void free_buffer(char *buffer);
+char **tokenize(char *str, char *delim);
+void free_tokens(char ***tokens);
 
 #endif /* #ifndef __SHELL_PRACTICE__H */
